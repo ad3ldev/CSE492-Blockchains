@@ -3,6 +3,27 @@ import json
 from utils import calculate_parent_hash, is_sorted, get_values_and_hashes
 import math
 
+def get_parent(pos):
+    return (pos - 1) // 2
+
+def create_hash_tree(leaf_hashes):
+    size = 2* len(leaf_hashes) - 1
+    tree = [None for i in range(size)]
+    start = len(leaf_hashes) - 1
+    end = size
+    for i in range(len(leaf_hashes)):
+        tree[i + start] = leaf_hashes[i]
+    while start != 0:
+        for i in range(start, end, 2):
+            parent = (i - 1) // 2
+            left = tree[i]
+            right = tree[i + 1]
+            tree[parent] = calculate_parent_hash(left, right)
+        end = start
+        start = start // 2
+    return tree
+
+
 def gen_non_membership_proof(value_to_prove, leaf_values, leaf_hashes):
     """
     :param value_to_prove: int (value to prove its non-membership)
@@ -24,7 +45,6 @@ def gen_non_membership_proof(value_to_prove, leaf_values, leaf_hashes):
     # (if bound doesn't exist in case of value_to_proof < min(leaf_values) or value_to_proof > max(leaf_values), let the proof be empty list)
     # you will use `gen_membership_proof`
     ######### YOUR CODE BEGINS HERE (Expected No. Lines: 12 lines) #########
-
     ###### YOUR CODE ENDS HERE #############
     return non_membership_proof_lower_bound, non_membership_proof_higher_bound, lower_bound_pos, upper_bound_pos
 
@@ -40,7 +60,13 @@ def gen_membership_proof(pos, leaf_hashes):
     # your code here: use (pos, leaf_hashes) to generate membership proof of element at position `pos`
     # to get next level hash use `calculate_parent_hash`
     ######### YOUR CODE BEGINS HERE (Expected No. Lines: 12 lines)  #########
-
+    tree_hashes = create_hash_tree(leaf_hashes)
+    pos = len(tree_hashes) - len(leaf_hashes) + pos
+    while pos != 0:
+        parent = get_parent(pos)
+        sibling = pos - 1 if pos % 2 == 0 else pos + 1
+        membership_proof.append(tree_hashes[sibling])
+        pos = parent
     ###### YOUR CODE ENDS HERE #############
     return membership_proof
 
@@ -58,15 +84,20 @@ def gen_proof(value_to_prove, leaf_values, leaf_hashes):
         membership_proof = gen_membership_proof(pos, leaf_hashes)
         return True, (membership_proof, pos)
     else:
-        non_membership_proof = gen_non_membership_proof(value_to_prove, leaf_values, leaf_hashes)
+        non_membership_proof = gen_non_membership_proof(
+            value_to_prove, leaf_values, leaf_hashes)
         return False, non_membership_proof
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="generation of membership / non membership proof")
-    parser.add_argument("--value", type=int, help="value to check its membership or non membership")
-    parser.add_argument("--merkle_leaves_file", help="file to merkle leaves", default="merkle_leaves.json")
-    parser.add_argument("--proof_file", help="file to save proof", default="proof.json")
+    parser = argparse.ArgumentParser(
+        description="generation of membership / non membership proof")
+    parser.add_argument("--value", type=int,
+                        help="value to check its membership or non membership")
+    parser.add_argument("--merkle_leaves_file",
+                        help="file to merkle leaves", default="merkle_leaves.json")
+    parser.add_argument(
+        "--proof_file", help="file to save proof", default="proof.json")
     args = parser.parse_args()
     with open(args.merkle_leaves_file, "r") as merkle_leaves_file_obj:
         leaves = json.load(merkle_leaves_file_obj)
@@ -90,12 +121,10 @@ if __name__ == "__main__":
         proof_result["upper_bound_hashes"] = non_membership_proof_upper_bound
         proof_result["lower_bound_pos"] = lower_bound_pos
         proof_result["upper_bound_pos"] = upper_bound_pos
-        proof_result["lower_bound_value"] = None if lower_bound_pos == -1 else leaf_values[lower_bound_pos]
-        proof_result["upper_bound_value"] = None if upper_bound_pos == -1 else leaf_values[upper_bound_pos]
+        proof_result["lower_bound_value"] = None if lower_bound_pos == - \
+            1 else leaf_values[lower_bound_pos]
+        proof_result["upper_bound_value"] = None if upper_bound_pos == - \
+            1 else leaf_values[upper_bound_pos]
         proof_result["target_value"] = args.value
     with open(args.proof_file, "w") as proof_file_obj:
         json.dump(proof_result, proof_file_obj)
-
-
-
-
