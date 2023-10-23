@@ -3,6 +3,9 @@ import json
 from utils import calculate_parent_hash, calculate_hash
 import math
 
+# I acknowledge that I am aware of the academic integrity guidelines of this course, 
+# and that I worked on this assignment independently without any unauthorized help.
+# عبد الرحمن عادل عبد الفتاح عبد الرؤوف
 
 def verify_membership(merkle_root, proof_hashes, pos, value):
     """
@@ -15,9 +18,8 @@ def verify_membership(merkle_root, proof_hashes, pos, value):
     # your code here: use (merkle_root, proof_hashes, pos, value) to verify membership
     # you should use calculate_hash, calculate_parent_hash
     # return True if membership is verified else return False
-    root_hash = calculate_hash(value)
     ######### YOUR CODE BEGINS HERE (Expected No. Lines: 7 lines) #########
-
+    
     ###### YOUR CODE ENDS HERE #############
     return root_hash == merkle_root
 

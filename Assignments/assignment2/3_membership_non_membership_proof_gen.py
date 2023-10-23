@@ -2,6 +2,9 @@ import argparse
 import json
 from utils import calculate_parent_hash, is_sorted, get_values_and_hashes
 import math
+# I acknowledge that I am aware of the academic integrity guidelines of this course, 
+# and that I worked on this assignment independently without any unauthorized help.
+# عبد الرحمن عادل عبد الفتاح عبد الرؤوف
 
 def get_parent(pos):
     return (pos - 1) // 2
