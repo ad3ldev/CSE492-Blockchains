@@ -3,9 +3,7 @@ import json
 from utils import calculate_parent_hash, calculate_hash
 import math
 
-# I acknowledge that I am aware of the academic integrity guidelines of this course, 
-# and that I worked on this assignment independently without any unauthorized help.
-# عبد الرحمن عادل عبد الفتاح عبد الرؤوف
+
 
 def verify_membership(merkle_root, proof_hashes, pos, value):
     """
@@ -18,8 +16,14 @@ def verify_membership(merkle_root, proof_hashes, pos, value):
     # your code here: use (merkle_root, proof_hashes, pos, value) to verify membership
     # you should use calculate_hash, calculate_parent_hash
     # return True if membership is verified else return False
+    root_hash = calculate_hash(value)
     ######### YOUR CODE BEGINS HERE (Expected No. Lines: 7 lines) #########
-    
+    for i in range(len(proof_hashes)):
+        if pos % 2 == 0:
+            root_hash = calculate_parent_hash(root_hash, proof_hashes[i])
+        else:
+            root_hash = calculate_parent_hash(proof_hashes[i], root_hash)
+        pos = pos // 2
     ###### YOUR CODE ENDS HERE #############
     return root_hash == merkle_root
 
@@ -47,7 +51,22 @@ def verify_non_membership(merkle_root, lower_bound_proof_hashes, upper_bound_pro
     # you should use verify_membership
     non_membership_verification = True
     ######### YOUR CODE BEGINS HERE (Expected No. Lines: 17 lines)#########
-
+    lower_bound_verification = True
+    upper_bound_verification = True
+    if lower_bound_value != None and upper_bound_value != None:
+        if target_value < lower_bound_value or target_value > upper_bound_value or lower_bound_pos + 1 != upper_bound_pos:
+            return False
+        lower_bound_verification = verify_membership(merkle_root, lower_bound_proof_hashes, lower_bound_pos, lower_bound_value)
+        upper_bound_verification = verify_membership(merkle_root, upper_bound_proof_hashes, upper_bound_pos, upper_bound_value)
+    elif upper_bound_value != None:
+        if target_value > upper_bound_value or lower_bound_pos != -1:
+            return False
+        upper_bound_verification = verify_membership(merkle_root, upper_bound_proof_hashes, upper_bound_pos, upper_bound_value)
+    elif lower_bound_value != None:
+        if target_value < lower_bound_value or upper_bound_pos != -1:
+            return False
+        lower_bound_verification = verify_membership(merkle_root, lower_bound_proof_hashes, lower_bound_pos, lower_bound_value)
+    non_membership_verification = lower_bound_verification and upper_bound_verification
     ######### YOUR CODE ENDS HERE #########
     return non_membership_verification
 
