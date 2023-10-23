@@ -27,6 +27,13 @@ def find_lower_bound(value_to_prove, leaf_values):
     pos = - 1
     size = len(leaf_values)
     found = False
+    min = leaf_values[0]
+    max = leaf_values[size - 1]
+    if value_to_prove < min :
+        return pos
+    if value_to_prove > max:
+        pos = size - 1
+        return pos
     while not found:
         if value_to_prove in leaf_values:
             found = True
@@ -42,7 +49,14 @@ def find_upper_bound(value_to_prove, leaf_values):
     pos = - 1
     size = len(leaf_values)
     found = False
-    while not found:
+    min = leaf_values[0]
+    max = leaf_values[size - 1]
+    if value_to_prove > max:
+        return pos
+    if value_to_prove < min:
+        pos = 0
+        return pos
+    while not found: 
         if value_to_prove in leaf_values:
             found = True
             pos = leaf_values.index(value_to_prove)
@@ -78,8 +92,8 @@ def gen_non_membership_proof(value_to_prove, leaf_values, leaf_hashes):
     ######### YOUR CODE BEGINS HERE (Expected No. Lines: 12 lines) #########
     lower_bound_pos = find_lower_bound(value_to_prove, leaf_values)
     upper_bound_pos = find_upper_bound(value_to_prove, leaf_values)
-    non_membership_proof_lower_bound = gen_membership_proof(lower_bound_pos, leaf_hashes)
-    non_membership_proof_higher_bound = gen_membership_proof(upper_bound_pos, leaf_hashes)
+    non_membership_proof_lower_bound = gen_membership_proof(lower_bound_pos, leaf_hashes) if lower_bound_pos != -1 else []
+    non_membership_proof_higher_bound = gen_membership_proof(upper_bound_pos, leaf_hashes) if upper_bound_pos != -1 else []
     ###### YOUR CODE ENDS HERE #############
     return non_membership_proof_lower_bound, non_membership_proof_higher_bound, lower_bound_pos, upper_bound_pos
 
