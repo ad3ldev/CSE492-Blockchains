@@ -23,6 +23,37 @@ def create_hash_tree(leaf_hashes):
         start = start // 2
     return tree
 
+def find_lower_bound(value_to_prove, leaf_values):
+    pos = - 1
+    size = len(leaf_values)
+    found = False
+    while not found:
+        if value_to_prove in leaf_values:
+            found = True
+            pos = leaf_values.index(value_to_prove)
+            for i in range(pos, size):
+                if leaf_values[i] != value_to_prove:
+                    pos = i - 1
+                    return pos
+        else:
+            value_to_prove -= 1
+    return pos
+def find_upper_bound(value_to_prove, leaf_values):
+    pos = - 1
+    size = len(leaf_values)
+    found = False
+    while not found:
+        if value_to_prove in leaf_values:
+            found = True
+            pos = leaf_values.index(value_to_prove)
+            for i in range(pos, size):
+                if leaf_values[i] != value_to_prove:
+                    pos = i - 1
+                    return pos
+        else:
+            value_to_prove += 1
+    return pos
+
 
 def gen_non_membership_proof(value_to_prove, leaf_values, leaf_hashes):
     """
@@ -45,6 +76,10 @@ def gen_non_membership_proof(value_to_prove, leaf_values, leaf_hashes):
     # (if bound doesn't exist in case of value_to_proof < min(leaf_values) or value_to_proof > max(leaf_values), let the proof be empty list)
     # you will use `gen_membership_proof`
     ######### YOUR CODE BEGINS HERE (Expected No. Lines: 12 lines) #########
+    lower_bound_pos = find_lower_bound(value_to_prove, leaf_values)
+    upper_bound_pos = find_upper_bound(value_to_prove, leaf_values)
+    non_membership_proof_lower_bound = gen_membership_proof(lower_bound_pos, leaf_hashes)
+    non_membership_proof_higher_bound = gen_membership_proof(upper_bound_pos, leaf_hashes)
     ###### YOUR CODE ENDS HERE #############
     return non_membership_proof_lower_bound, non_membership_proof_higher_bound, lower_bound_pos, upper_bound_pos
 
