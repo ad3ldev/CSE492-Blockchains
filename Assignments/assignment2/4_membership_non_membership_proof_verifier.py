@@ -59,11 +59,11 @@ def verify_non_membership(merkle_root, lower_bound_proof_hashes, upper_bound_pro
         lower_bound_verification = verify_membership(merkle_root, lower_bound_proof_hashes, lower_bound_pos, lower_bound_value)
         upper_bound_verification = verify_membership(merkle_root, upper_bound_proof_hashes, upper_bound_pos, upper_bound_value)
     elif upper_bound_value != None:
-        if target_value > upper_bound_value or lower_bound_pos != -1:
+        if target_value > upper_bound_value or upper_bound_pos != 0:
             return False
         upper_bound_verification = verify_membership(merkle_root, upper_bound_proof_hashes, upper_bound_pos, upper_bound_value)
     elif lower_bound_value != None:
-        if target_value < lower_bound_value or upper_bound_pos != -1:
+        if target_value < lower_bound_value and lower_bound_pos != pow(2, len(lower_bound_proof_hashes)) - 1:
             return False
         lower_bound_verification = verify_membership(merkle_root, lower_bound_proof_hashes, lower_bound_pos, lower_bound_value)
     non_membership_verification = lower_bound_verification and upper_bound_verification
