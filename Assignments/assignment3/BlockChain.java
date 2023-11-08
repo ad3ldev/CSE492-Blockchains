@@ -2,6 +2,10 @@
 // You should not have all the blocks added to the block chain in memory 
 // as it would cause a memory overflow.
 
+// “I acknowledge that I am aware of the academic integrity guidelines of this course,
+// and that I worked on this assignment independently without any unauthorized help with coding or testing.” 
+// - عبد الرحمن عادل عبد الفتاح عبد الرؤوف 
+
 import java.sql.Timestamp;
 import java.util.ArrayList;
 
