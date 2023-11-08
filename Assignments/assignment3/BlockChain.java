@@ -2,7 +2,6 @@
 // You should not have all the blocks added to the block chain in memory 
 // as it would cause a memory overflow.
 
-// asg3_1702296_AbdelRahmanAdelAbdelFattah
 /*
  * The transaction hash on the raw transaction data is computed using SHA-256.
  *  This technique causes problems for coinbase transactions since the transaction
