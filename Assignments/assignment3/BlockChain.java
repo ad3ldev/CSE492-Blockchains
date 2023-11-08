@@ -2,9 +2,27 @@
 // You should not have all the blocks added to the block chain in memory 
 // as it would cause a memory overflow.
 
-// “I acknowledge that I am aware of the academic integrity guidelines of this course,
-// and that I worked on this assignment independently without any unauthorized help with coding or testing.” 
-// - عبد الرحمن عادل عبد الفتاح عبد الرؤوف 
+// asg3_1702296_AbdelRahmanAdelAbdelFattah
+/*
+ * The transaction hash on the raw transaction data is computed using SHA-256.
+ *  This technique causes problems for coinbase transactions since the transaction
+ * has a variable field called the "coinbase input," which miners can change.
+ * 
+ * If the hash of the transaction contains the coinbase input,
+ *  miners can modify the coinbase transaction until they find a valid hash (nonce) 
+ * that satisfies the proof-of-work requirement.
+ * 
+ * Bitcoin avoids this issue by utilizing the "Merkle root." 
+ * Rather than hashing the entire raw transaction data directly
+ *  Bitcoin builds a Merkle tree, or hash tree, of all the transactions in a block.
+ * This tree's root is located in the block header. The Merkle root is then used in the proof-of-work.
+ */
+
+/*
+* “I acknowledge that I am aware of the academic integrity guidelines of this course,
+* and that I worked on this assignment independently without any unauthorized help with coding or testing.” 
+* - عبد الرحمن عادل عبد الفتاح عبد الرؤوف 
+*/
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
