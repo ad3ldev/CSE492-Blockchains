@@ -28,38 +28,34 @@ public class TxHandler {
         double outputSum = 0;
         ArrayList<UTXO> utxosUsed = new ArrayList<UTXO>();
 
-        for (int i = 0; i < tx.numInputs(); i++) {
-            Transaction.Input input = tx.getInput(i);
-            int outputIndex = input.outputIndex;
-            byte[] prevTxHash = input.prevTxHash;
-            byte[] signature = input.signature;
-
-            UTXO utxo = new UTXO(prevTxHash, outputIndex);
-            // Check if utxo is in the current UTXO pool
+        for (Transaction.Input input : tx.getInputs()) {
+            UTXO utxo = new UTXO(input.prevTxHash, input.outputIndex);
+            // (1) all outputs claimed by {@code tx} are in the current UTXO pool
             if (!this.utxoPool.contains(utxo)) {
                 return false;
             }
-            // Check if input signature is valid
+            // (2) the signatures on each input of {@code tx} are valid
             Transaction.Output output = this.utxoPool.getTxOutput(utxo);
-            byte[] message = tx.getRawDataToSign(i);
-            if (!Crypto.verifySignature(output.address, message, signature)) {
+            byte[] message = tx.getRawDataToSign(tx.getInputs().indexOf(input));
+            if (!Crypto.verifySignature(output.address, message, input.signature)) {
                 return false;
             }
-            // check if utxo is claimed multiple times
+            // (3) no UTXO is claimed multiple times by {@code tx}
             if (utxosUsed.contains(utxo)) {
                 return false;
             }
             utxosUsed.add(utxo);
             inputSum += output.value;
         }
-        // check if output value is non-negative
-        for (int i = 0; i < tx.numOutputs(); i++) {
-            Transaction.Output output = tx.getOutput(i);
+        // (4) all of {@code tx}s output values are non-negative
+        for (Transaction.Output output : tx.getOutputs()) {
             if (output.value < 0) {
                 return false;
             }
             outputSum += output.value;
         }
+        // (5) the sum of {@code tx}s input values is greater than or equal to the sum
+        // of its output
         return inputSum >= outputSum;
     }
 
@@ -71,7 +67,7 @@ public class TxHandler {
      * updating the current UTXO pool as appropriate.
      */
     public Transaction[] handleTxs(Transaction[] possibleTxs) {
-        ArrayList<Transaction> validTxs = new ArrayList<Transaction>();
+        ArrayList<Transaction> validTxs = new ArrayList<>();
         for (Transaction tx : possibleTxs) {
             if (isValidTx(tx)) {
                 validTxs.add(tx);
@@ -79,9 +75,8 @@ public class TxHandler {
                     UTXO utxo = new UTXO(input.prevTxHash, input.outputIndex);
                     this.utxoPool.removeUTXO(utxo);
                 }
-                for (int i = 0; i < tx.numOutputs(); i++) {
-                    Transaction.Output output = tx.getOutput(i);
-                    UTXO utxo = new UTXO(tx.getHash(), i);
+                for (Transaction.Output output : tx.getOutputs()) {
+                    UTXO utxo = new UTXO(tx.getHash(), tx.getOutputs().indexOf(output));
                     this.utxoPool.addUTXO(utxo, output);
                 }
             }
