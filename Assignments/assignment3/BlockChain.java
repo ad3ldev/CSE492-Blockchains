@@ -7,9 +7,14 @@ import java.util.ArrayList;
 
 public class BlockChain {
     public static final int CUT_OFF_AGE = 10;
+    public static final int MAX_SIZE = 1_000;
     private BlockNode maxHeightNode;
     private TransactionPool txPool = new TransactionPool();
     private ArrayList<BlockNode> blockchain = new ArrayList<>();
+
+    public int getBlockchain() {
+        return this.blockchain.size();
+    }
 
     public class BlockNode {
         private Block block;
@@ -70,7 +75,14 @@ public class BlockChain {
         }
         BlockNode genesisNode = new BlockNode(genesisBlock, 1, utxoPool, txPool);
         this.maxHeightNode = genesisNode;
-        this.blockchain.add(genesisNode);
+        addInBlockchain(genesisNode);
+    }
+
+    private boolean addInBlockchain(BlockNode node) {
+        if (this.blockchain.size() == MAX_SIZE) {
+            this.blockchain.remove(0);
+        }
+        return this.blockchain.add(node);
     }
 
     /** Get the maximum height block */
@@ -141,13 +153,14 @@ public class BlockChain {
             utxoPool.addUTXO(utxo, output);
         }
         BlockNode newNode = new BlockNode(block, blockHeight, utxoPool, txPool);
-        boolean addNewBlock = blockchain.add(newNode);
+        boolean addNewBlock = addInBlockchain(newNode);
         if (addNewBlock) {
             updateMaxHeightNode();
         }
         return addNewBlock;
-    
+
     }
+
     public void updateMaxHeightNode() {
         BlockNode currentMaxHeightNode = this.maxHeightNode;
         for (BlockNode b : this.blockchain) {
@@ -162,7 +175,6 @@ public class BlockChain {
         this.maxHeightNode = currentMaxHeightNode;
     }
 
-    
     /** Add a transaction to the transaction pool */
     public void addTransaction(Transaction tx) {
         this.txPool.addTransaction(tx);
